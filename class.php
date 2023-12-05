@@ -1,82 +1,321 @@
 <?php
-
 class html{
-  public $raiz;
-  public $pasta_css;
-  public $pasta_img;
-  public $pasta_js;
-  public $head_site;
-  public $head_url;
-  public $head_marca;
-  public $head_icone;
-  public $head_titulo;
-  public $head_descricao;
-  public $head_tag;
-  
-  
-  public function __construct(){
-    if(substr_count($_SERVER['PHP_SELF'], '/')>=2){
-        $this->raiz = '../';
-    }else{
-        $this->raiz = '';
+    public $raiz;
+    public $pasta_css;
+    public $pasta_img;
+    public $pasta_js;
+    
+    public function __construct(){
+      if(substr_count($_SERVER['PHP_SELF'], '/')>=2){
+          $this->raiz = '../';
+      }else{
+          $this->raiz = '';
+      }
     }
-    $this->pasta_css = $this->raiz.'';
-    $this->pasta_js = $this->raiz.'';
-    $this->pasta_img = $this->raiz.'';
-    $this->pasta_idioma = 'pt-BR';
-    $this->pasta_tipo = 'website';
-  }
 
-  public function head($marca, $urlicone, $urlfundo, $titulo, $descricao, $tags, $extra = NULL){
-    $this->site_marca = 'https://'.$_SERVER["SERVER_NAME"];
-    $this->url_marca = 'https://'.$_SERVER["SERVER_NAME"].$_SERVER["PHP_SELF"];
-    $this->head_marca = $marca;
-    if (strpos($head_icone, 'http') !== false) {
-        $this->head_icone = $urlfundo;
-    }else{
-        $this->head_icone = 'https://'.$_SERVER["SERVER_NAME"].$this->pasta_img.$urlicone;
-    }
-    $this->head_image_type = explode(".", $urlfundo);
-    if(isset($this->head_image_type[1])){
-        $this->head_image_type = "image/".$this->head_image_type[1];
-    }else{
-        $this->head_image_type = "image";
-    }
-    if (strpos($urlfundo, 'https') !== false) {
-        $this->head_fundo = $urlfundo;
-    }else{
-        $this->head_fundo = 'https://'.$_SERVER["SERVER_NAME"].$this->pasta_img.$urlfundo;
-    }
-    list($this->head_image_width, $this->head_image_height) = getimagesize($this->head_fundo);
-    $this->head_titulo = $titulo;
-    $this->head_descricao = $descricao;
-    $this->head_tag = $tags;
-    if(isset($extra)){
-      $this->head_extra = $extra;
-    }else{
-      $this->head_extra = "";
-    }
-        return "<head><title>{$this->head_titulo} - {$this->head_marca}</title>
-            <meta charset='utf-8' />
-            <!--[if IE]><meta http-equiv='ImageToolbar' content='False' /><![endif]-->
-            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-            <meta name='author' content='{$this->head_marca}' />
-            <meta name='generator' content='{$this->head_marca}' />
-            <meta name='description' content='{$this->head_descricao}' />
-            <meta name='keywords' content='{$this->head_tag}' />
-            <meta property='og:locale' content='{$this->head_idioma}' />
-            <meta property='og:type' content='{$this->head_tipo}' />
-            <meta property='og:url' content='{$this->head_url}' />
-            <meta property='og:title' content='{$this->head_titulo}' />
-            <meta property='og:site_name' content='{$this->head_marca}' />
-            <meta property='og:description' content='{$this->head_descricao}' />
-            <meta property='og:image' content='{$this->head_fundo}' />
-            <meta property='og:image:type' content='{$this->head_image_type}'>
-            <meta property='og:image:width' content='{$this->head_image_width}'>
-            <meta property='og:image:height' content='{$this->head_image_height}'>
-            <link rel='icon' type='imagem/png' href='{$this->head_icone}'>
-            {$this->head_extra}
-    </head>";
-  }
+
+    public function get_img($texto){
+        if (strpos($texto, 'http') !== false) {
+            return $texto;
+        }else{
+            if(file_exists($this->pasta_img.$texto.".jpeg")){
+                return $this->pasta_img.$texto.".jpeg";
+            }else{
+                if(file_exists($this->pasta_img.$texto.".gif")){
+                    return $this->pasta_img.$texto.".gif";
+                }else{
+                    if(file_exists($this->pasta_img.$texto.".png")){
+                        return $this->pasta_img.$texto.".png";
+                    }else{
+                        if(file_exists($this->pasta_img.$texto.".jpg")){
+                            return $this->pasta_img.$texto.".jpg";
+                        }else{
+                          if(file_exists($this->pasta_img."icon/".$texto.".jpeg")){
+                            return $this->pasta_img."icon/".$texto.".jpeg";
+                        }else{
+                            if(file_exists($this->pasta_img."icon/".$texto.".gif")){
+                                return $this->pasta_img."icon/".$texto.".gif";
+                            }else{
+                                if(file_exists($this->pasta_img."icon/".$texto.".png")){
+                                    return $this->pasta_img."icon/".$texto.".png";
+                                }else{
+                                    if(file_exists($this->pasta_img."icon/".$texto.".jpg")){
+                                        return $this->pasta_img."icon/".$texto.".jpg";
+                                    }else{
+                                      if(file_exists($this->pasta_img."icon/".$texto.".svg")){
+                                        return $this->pasta_img."icon/".$texto.".svg";
+                                    }else{
+                                        return false;
+                                    }
+                                    }
+                                }
+                            }
+                        }
+                        }
+                    }
+                }
+            }
+        }
+      }
+
+    public function pasta_css($pasta){
+        $this->pasta_css = $this->raiz.$pasta;
+      }
+      public function pasta_js($pasta){
+        $this->pasta_js = $this->raiz.$pasta;
+      }
+      public function pasta_img($texto){
+        $this->pasta_img = $this->raiz.$texto;
+      }
+
+    public function _css($nome){
+        if(file_exists($this->pasta_css.$nome.".css")){
+          return "<style>".file_get_contents($this->pasta_css.$nome.".css")."</style>";
+        }else{
+          return "";
+        }
+      }
+  
+      public function _js($nome){
+        if(file_exists($this->pasta_js.$nome.".js")){
+          return "<script>".file_get_contents($this->pasta_js.$nome.".js")."</script>";
+        }else{
+          return "";
+        }
+      }
+    public function tag($array){
+        $lista = "";
+        if(array($array)){
+          foreach ($array as $key => $value) {
+            $lista .= $key."='{$value}' ";
+          }
+          return $lista;
+        }
+      }
+
+    function nav($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "<nav {$id} {$class} {$tag}>{$this->_css($_class[0])}{$dados}{$this->_js($_class[0])}</nav>";
+      }
+      function div($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "<div {$id} {$class} {$tag}>{$this->_css($_class[0])}{$dados}{$this->_js($_class[0])}</div>";
+      }
+      function form($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "<form {$id} {$class} {$tag}>{$this->_css($_class[0])}{$dados}{$this->_js($_class[0])}</form>";
+      }
+      function input($class, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<input {$id} {$class} {$tag}>{$this->_js($_class[0])}";
+      }
+      function img($class, $url, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<img {$id} {$class} src='{$this->get_img($url)}' alt='{$_class[0]}' {$tag}>{$this->_js($_class[0])}";
+      }
+      function button($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<button {$id} {$class} {$tag}>{$dados}</button>{$this->_js($_class[0])}";
+      }
+      function strong($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<strong {$id} {$class} {$tag}>{$dados}</strong>{$this->_js($_class[0])}";
+      }
+      function span($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<span {$id} {$class} {$tag}>{$dados}</span>{$this->_js($_class[0])}";
+      }
+      function h1($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<h1 {$id} {$class} {$tag}>{$dados}</h1>{$this->_js($_class[0])}";
+      }
+      function h2($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<h2 {$id} {$class} {$tag}>{$dados}</h2>{$this->_js($_class[0])}";
+      }
+      function h3($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<h3 {$id} {$class} {$tag}>{$dados}</h3>{$this->_js($_class[0])}";
+      }
+      function p($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<p {$id} {$class} {$tag}>{$dados}</p>{$this->_js($_class[0])}";
+      }
+      function a($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<a {$id} {$class} {$tag}>{$dados}</a>{$this->_js($_class[0])}";
+      }
+      function iframe($class, $dados, $tag = NULL){
+        $_class = explode(" ", $class);
+        if($_class[0]==""){
+            $id = "";
+            $class = "";
+        }else{
+            $id = "id='{$_class[0]}'";
+            $class = "class='{$class}'";
+        }
+        if(isset($tag)){
+          $tag = $this->tag($tag);
+        }else{
+          $tag = "";
+        }
+        return "{$this->_css($_class[0])}<iframe {$id} {$class} src='{$dados}'{$tag}></iframe>{$this->_js($_class[0])}";
+      }
 }
 ?>
